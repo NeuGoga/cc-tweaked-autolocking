@@ -55,7 +55,7 @@ local function runSetupWizard()
     end
     print("Calculated Detector Position: " .. config.detector.x .. ", " .. config.detector.y .. ", " .. config.detector.z)
 
-    config.secretKey = prompt("Enter a secret key for network security")
+    config.secretKey = prompt("Enter a secret key for network security (the longer, the better)")
     config.networkChannel = tonumber(prompt("Enter network channel (e.g., 10)"))
     
     config.barrelLength = 0
@@ -117,6 +117,23 @@ assignPeripherals()
 if not (yaw and pitch and blockReader and entDet and mon and lever and modem) then
     print("Error: Missing peripherals! Check: Speed Controllers, Block Reader, Environment Detector, Monitor, Relay, Modem."); return
 end
+-- I would change this to a bunch of asserts
+-- It both: gets necessary peripherals and checks for them
+--[[
+yaw = assert(peripheral.wrap("left"), "Yaw Speed controller (left) not found!")
+
+pitch = assert(peripheral.wrap("right"), "Pitch Speed controller (right) not found!")
+
+blockReader = assert(peripheral.find("blockReader"), "Block Reader not found!")
+
+entDet = assert(peripheral.find("environmentDetector"), "Environment Detector not found!")
+
+mon = assert(peripheral.find("monitor"), "Monitor not found not found!")
+
+lever = assert(peripheral.find("redstoneIntegrator"), "Redstone Integrator not found!")
+
+modem = assert(peripheral.find("modem"), "Yaw Speed controller (left) not found!")
+--]]
 
 print("All peripherals found.")
 mon.clear(); mon.setCursorPos(1, 1); mon.write("System Ready. Made by NeuGoga."); sleep(2)
@@ -166,17 +183,10 @@ local shotFired = 0
 -- Core Utility, Target List, & Rotation Functions
 -- =================================================================
 
-local function simpleHash(str)
-    local hash = 5381
-    for i = 1, #str do
-        hash = (hash * 33) + string.byte(str, i)
-        hash = bit.band(hash, 0xFFFFFFFF)
-    end
-    return tostring(hash)
-end
+local sha = require('sha2')
 
 local function generateSignature(message, key)
-    return simpleHash(message .. key)
+    return sha.sha256(math.floor(os.epoch('utc')) .. sha.sha224(message) .. key) --hash changes every *ms, will fail if server is lagging, to increase message time window you can device epoch by desired ms window
 end
 
 local function loadTargetList()
@@ -419,7 +429,8 @@ end
 
 function broadcastEngagementState()
     isEngaged = not isEngaged
-    local msg = { type = "engagement", state = isEngaged, timestamp = os.epoch("utc") }
+    --local msg = { type = "engagement", state = isEngaged }
+    local msg = { type = 0xDEADBEEF, state = isEngaged } -- the less descriptive data is, the harder to get what exactly it does. Ideally it should be random and unique.
     local ser = textutils.serialize(msg)
     local sig = generateSignature(ser, config.secretKey)
     modem.transmit(config.networkChannel, config.networkChannel, { message = ser, signature = sig })
@@ -429,27 +440,24 @@ end
 local function listenForNetworkMessages()
     modem.open(config.networkChannel)
     while true do
+    local status, err = pcall(function()
         local _, _, _, _, rx = os.pullEvent("modem_message")
-        local ok, err = pcall(function()
-            if type(rx) == "table" and rx.message and rx.signature then
-                if generateSignature(rx.message, config.secretKey) == rx.signature then
-                    local msg = textutils.unserialize(rx.message)
-                    if msg and msg.timestamp and not processed_timestamps[msg.timestamp] then
-                        processed_timestamps[msg.timestamp] = true
-                        if msg.type == "engagement" then
-                            if msg.state ~= isEngaged then isEngaged = msg.state; drawUI() end
-                        elseif msg.type == "request_toggle" then
-                            print("Toggle request received, broadcasting new state.")
-                            broadcastEngagementState()
-                        end
+        -- if rx.* exists then it's type will be anything BUT 'nil'
+        if type(rx) == "table" and type(rx.message) == "string" and type(rx.signature) == "string" then
+            if generateSignature(rx.message, config.secretKey) == rx.signature then
+                local msg = textutils.unserialize(rx.message)
+                if type(msg) == "table" and type(msg.type) == "number" and type(msg.state) == "boolean" then
+                    if msg.type == 0xDEADBEEF then
+                        if msg.state ~= isEngaged then isEngaged = msg.state; drawUI() end
+                    elseif msg.type == 0xFEEDBEEF then --this change should also apply on client
+                        print("Toggle request received, broadcasting new state.")
+                        broadcastEngagementState()
                     end
                 end
             end
-        end)
-        if not ok then
-            printError("Network Error: " .. tostring(err))
-            printError("Received problematic message: " .. textutils.serialize(rx))
         end
+    end)
+    if not status then print("Data:", textutils.serialise(rx)); print("Error:",err) end
     end
 end
 
