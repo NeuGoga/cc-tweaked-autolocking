@@ -372,19 +372,25 @@ local function listenForNetworkMessages()
     modem.open(config.networkChannel)
     while true do
         local _, _, _, _, rx = os.pullEvent("modem_message")
-        if type(rx) == "table" and rx.message and rx.signature then
-            if generateSignature(rx.message, config.secretKey) == rx.signature then
-                local msg = textutils.unserialize(rx.message)
-                if msg and msg.timestamp and not processed_timestamps[msg.timestamp] then
-                    processed_timestamps[msg.timestamp] = true
-                    if msg.type == "engagement" then
-                        if msg.state ~= isEngaged then isEngaged = msg.state; drawUI() end
-                    elseif msg.type == "request_toggle" then
-                        print("Toggle request received, broadcasting new state.")
-                        broadcastEngagementState()
+        local ok, err = pcall(function()
+            if type(rx) == "table" and rx.message and rx.signature then
+                if generateSignature(rx.message, config.secretKey) == rx.signature then
+                    local msg = textutils.unserialize(rx.message)
+                    if msg and msg.timestamp and not processed_timestamps[msg.timestamp] then
+                        processed_timestamps[msg.timestamp] = true
+                        if msg.type == "engagement" then
+                            if msg.state ~= isEngaged then isEngaged = msg.state; drawUI() end
+                        elseif msg.type == "request_toggle" then
+                            print("Toggle request received, broadcasting new state.")
+                            broadcastEngagementState()
+                        end
                     end
                 end
             end
+        end)
+        if not ok then
+            printError("Network Error: " .. tostring(err))
+            printError("Received problematic message: " .. textutils.serialize(rx))
         end
     end
 end
