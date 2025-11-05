@@ -74,6 +74,10 @@ if mainProgramData.dependencies then
     end
 end
 
+table.insert(files_to_check, "updater")
+
+local newLocalManifest = { project = remoteManifest.project, files = {} }
+
 for _, filename in ipairs(files_to_check) do
     local remoteData = remoteManifest.files[filename]
     if remoteData then
