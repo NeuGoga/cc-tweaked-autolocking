@@ -1,0 +1,28 @@
+{
+  "project": "CreateBigCannons Turret Suite",
+  "files": {
+    "updater": {
+      "version": "2.0",
+      "source": "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-autolocking/main/updater.lua"
+    },
+    "sha256": {
+      "version": "1.0",
+      "source": "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-autolocking/main/sha256.lua"
+    },
+    "player_turret": {
+      "version": "7.1", 
+      "source": "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-autolocking/main/player_turret.lua",
+      "dependencies": ["sha256"]
+    },
+    "entity_turret": {
+      "version": "3.0",
+      "source": "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-autolocking/main/entity_turret.lua",
+      "dependencies": ["sha256"]
+    },
+    "remote": {
+      "version": "3.1",
+      "source": "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-autolocking/main/remote.lua",
+      "dependencies": ["sha256"]
+    }
+  }
+}

@@ -7,9 +7,7 @@ local function ensureUpdater()
     local final_program_name = "player_turret" 
     local startup_name = "startup"
     
-    local repo_base_url = "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-autolocking/main/"
-    local updater_url = repo_base_url .. updater_name .. ".lua"
-    local this_program_url = repo_base_url .. final_program_name .. ".lua"
+    local updater_url = "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-autolocking/main/updater.lua"
 
     local needs_install = false
     if not fs.exists(updater_name) then
@@ -22,7 +20,7 @@ local function ensureUpdater()
         needs_install = true
     end
 
-    local expected_startup_content = 'shell.run("'..updater_name..'", "'..this_program_url..'", "'..final_program_name..'")'
+    local expected_startup_content = 'shell.run("'..updater_name..'", "'..final_program_name..'")'
     local startup_content = ""
     if fs.exists(startup_name) then
         local file = fs.open(startup_name, "r"); startup_content = file.readAll(); file.close()
