@@ -483,8 +483,8 @@ local function listenForNetworkMessages()
             if type(rx) == "table" and rx.message and rx.signature then
                 if generateSignature(rx.message, config.secretKey) == rx.signature then
                     local msg = textutils.unserialize(rx.message)
-                    if msg and msg.timestamp and not processed_timestamps[msg.timestamp] then
-                        processed_timestamps[msg.timestamp] = true
+                    if msg and msg.timestamp and not processedTimestamps[msg.timestamp] then
+                        processedTimestamps[msg.timestamp] = true
                         if msg.type == "engagement" then
                             if msg.state ~= isEngaged then isEngaged = msg.state; drawUI() end
                         elseif msg.type == "request_toggle" then
