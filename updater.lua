@@ -29,6 +29,18 @@ local function download(url_path, file_path)
     return true
 end
 
+local function compareVersions(v1, v2)
+    local parts1 = {}; for part in string.gmatch(v1, "[^.]+") do table.insert(parts1, tonumber(part)) end
+    local parts2 = {}; for part in string.gmatch(v2, "[^.]+") do table.insert(parts2, tonumber(part)) end
+    for i = 1, math.max(#parts1, #parts2) do
+        local p1 = parts1[i] or 0
+        local p2 = parts2[i] or 0
+        if p1 > p2 then return true end
+        if p1 < p2 then return false end
+    end
+    return false
+end
+
 term.clear(); term.setCursorPos(1, 1); print("Checking for updates...")
 
 if not download(MANIFEST_URL, ".manifest.temp") then print("FATAL: Could not download manifest."); return end
