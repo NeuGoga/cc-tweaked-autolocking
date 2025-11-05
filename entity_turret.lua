@@ -8,7 +8,7 @@ local function ensureUpdater()
     local startup_name = "startup"
     
     local repo_base_url = "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-autolocking/main/"
-    local updater_url = repo_base_url .. updater_name
+    local updater_url = repo_base_url .. updater_name .. ".lua"
     local this_program_url = repo_base_url .. final_program_name .. ".lua"
 
     local needs_install = false
