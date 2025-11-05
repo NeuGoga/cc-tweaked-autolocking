@@ -30,7 +30,7 @@ An advanced, high-precision auto-turret script designed for CC:Tweaked and the C
 
 ### How to Setup:
 
-- **Guide:** https://youtu.be/SptnBc3WCuM?si=XpBNvYmqPQH0OjQT
+- **Guide:** https://www.youtube.com/watch?v=qtvYkLEvNfg
 
 ## How to Use
 
