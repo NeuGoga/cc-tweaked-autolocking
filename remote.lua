@@ -3,7 +3,7 @@
 -- =================================================================
 
 local function ensureUpdater()
-    local this_program_name = shell.getRunningProgram()
+    local updater_name = "updater"
     local final_program_name = "remote" 
     local startup_name = "startup"
     
@@ -11,6 +11,7 @@ local function ensureUpdater()
     local updater_url = repo_base_url .. updater_name .. ".lua"
     local this_program_url = repo_base_url .. final_program_name .. ".lua"
 
+    local needs_install = false
     if not fs.exists(updater_name) then
         print("Updater not found. Downloading...")
         local response = http.get(updater_url)
@@ -18,9 +19,10 @@ local function ensureUpdater()
         local content = response.readAll(); response.close()
         local file = fs.open(updater_name, "w"); file.write(content); file.close()
         print("Updater downloaded successfully.")
+        needs_install = true
     end
 
-    local expected_startup_content = 'shell.run("'..updater_name..'", "'..this_program_url..'", "'..this_program_name..'")'
+    local expected_startup_content = 'shell.run("'..updater_name..'", "'..this_program_url..'", "'..final_program_name..'")'
     local startup_content = ""
     if fs.exists(startup_name) then
         local file = fs.open(startup_name, "r"); startup_content = file.readAll(); file.close()
@@ -28,8 +30,13 @@ local function ensureUpdater()
     
     if startup_content ~= expected_startup_content then
         print("Configuring startup file for updates...")
-        local file = fs.open(startup_name, "w"); file.write(expected_startup_content); file.close()
-        
+        local file = fs.open(startup_name, "w")
+        file.write(expected_startup_content)
+        file.close()
+        needs_install = true
+    end
+    
+    if needs_install then
         print("Bootstrap complete. Rebooting to initialize updater...")
         sleep(3)
         os.reboot()
