@@ -59,26 +59,44 @@ if remoteUpdaterData and compareVersions(remoteUpdaterData.version, localUpdater
     print("Updater is outdated. Staging self-update...")
     local stub = fs.open(UPDATER_STUB_FILE, "w")
     stub.write([[
-
-        local url, path = ...
-        local temp_path = path .. ".temp_download"
+        local url, updater_path, manifest_path, new_version = ...
         
+        print("Finalizing update...")
+        
+        local temp_path = updater_path .. ".temp"
         local response = http.get(url)
         if not response then print("Self-update failed: Download error."); return end
         local content = response.readAll(); response.close()
-        
+        if not content or #content == 0 then print("Self-update failed: Empty file."); return end
         local temp_file = fs.open(temp_path, "w"); temp_file.write(content); temp_file.close()
         
-        fs.delete(path)
-        fs.move(temp_path, path)
+        fs.delete(updater_path)
+        fs.move(temp_path, updater_path)
+        print("Updater file replaced.")
+        
+        local manifest = {}
+        if fs.exists(manifest_path) then
+            local mf = fs.open(manifest_path, "r")
+            local m_content = mf.readAll(); mf.close()
+            manifest = textutils.unserializeJSON(m_content) or {}
+        end
+        
+        manifest.files = manifest.files or {}
+        manifest.files.updater = manifest.files.updater or {}
+        manifest.files.updater.version = new_version
+        
+        local mf_out = fs.open(manifest_path, "w")
+        mf_out.write(textutils.serializeJSON(manifest, { pretty = true }))
+        mf_out.close()
+        print("Local manifest updated to version: " .. new_version)
         
         print("Updater has been updated. Rebooting to apply changes...")
-        sleep(1)
+        sleep(0.5)
         os.reboot()
     ]])
     stub.close()
     
-    shell.run(UPDATER_STUB_FILE, remoteUpdaterData.source, "updater")
+    shell.run(UPDATER_STUB_FILE, remoteUpdaterData.source, "updater", LOCAL_MANIFEST_FILE, remoteUpdaterData.version)
     return 
 end
 
