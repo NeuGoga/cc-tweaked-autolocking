@@ -36,7 +36,7 @@ local function ensureUpdater()
     
     if needs_install then
         print("Bootstrap complete. Rebooting to initialize updater...")
-        sleep(3)
+        sleep(1)
         os.reboot()
         return false
     end
