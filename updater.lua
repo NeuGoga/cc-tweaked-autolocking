@@ -54,11 +54,32 @@ if not remoteManifest or not remoteManifest.files then print("FATAL: Invalid rem
 
 local remoteUpdaterData = remoteManifest.files.updater
 local localUpdaterVersion = (localManifest.files and localManifest.files.updater) and localManifest.files.updater.version or "0.0"
+
 if remoteUpdaterData and compareVersions(remoteUpdaterData.version, localUpdaterVersion) then
-    print("Updater is outdated. Performing self-update...")
-    local stub = fs.open(UPDATER_STUB_FILE, "w"); stub.write([[print("Finalizing update..."); local url, path = ...; local r = http.get(url); local c = r.readAll(); r.close(); fs.delete(path); local f = fs.open(path, "w"); f.write(c); f.close(); print("Updater updated. Restarting..."); sleep(2); shell.run("startup")]]); stub.close()
+    print("Updater is outdated. Staging self-update...")
+    local stub = fs.open(UPDATER_STUB_FILE, "w")
+    stub.write([[
+
+        local url, path = ...
+        local temp_path = path .. ".temp_download"
+        
+        local response = http.get(url)
+        if not response then print("Self-update failed: Download error."); return end
+        local content = response.readAll(); response.close()
+        
+        local temp_file = fs.open(temp_path, "w"); temp_file.write(content); temp_file.close()
+        
+        fs.delete(path)
+        fs.move(temp_path, path)
+        
+        print("Updater has been updated. Rebooting to apply changes...")
+        sleep(1)
+        os.reboot()
+    ]])
+    stub.close()
+    
     shell.run(UPDATER_STUB_FILE, remoteUpdaterData.source, "updater")
-    return
+    return 
 end
 
 local files_to_check = {}
