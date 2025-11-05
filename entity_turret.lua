@@ -218,17 +218,14 @@ local shotFired = 0
 -- Core Utility, Target List, & Rotation Functions
 -- =================================================================
 
-local function simpleHash(str)
-    local hash = 5381
-    for i = 1, #str do
-        hash = (hash * 33) + string.byte(str, i)
-        hash = bit.band(hash, 0xFFFFFFFF)
-    end
-    return tostring(hash)
+if not fs.exists("sha256") then
+    error("sha256 library not found! Please ensure it is present.")
 end
 
+local sha256 = require("sha256")
+
 local function generateSignature(message, key)
-    return simpleHash(message .. key)
+    return sha256.hex(message .. key)
 end
 
 local function loadTargetList()
