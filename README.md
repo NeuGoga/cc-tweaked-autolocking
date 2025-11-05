@@ -7,6 +7,7 @@ An advanced, high-precision auto-turret script designed for CC:Tweaked and the C
 - **Dynamic Projectile Speed:** Uses a lookup table based on cannon barrel length for perfect calculations.
 - **Full User Interface:** An in-game monitor provides engagement controls, a target list management system, and a reset button.
 - **Network Synchronization:** A secure, encrypted and modem-based system allows a single remote to control multiple turrets in unison.
+- **Auto-Updating**
 - **Two Versions:**
     - `entity_turret.lua`: The primary version, for targeting any entity (mobs, players, etc.) using an Environment Detector.
     - `player_turret.lua`: A simplified version that targets only players, for setups without an Environment Detector.
@@ -21,7 +22,7 @@ An advanced, high-precision auto-turret script designed for CC:Tweaked and the C
 ### In-Game Build:
 - A Create Big Cannons turret built with **Rotation Speed Controllers** for both Yaw and Pitch.
 - A **Computer** with peripherals attached.
-- A **Redstone Integrator** for fire control and rotation locking.
+- A **Redstone Integrator/Relay** for fire control and rotation locking.
 - A **Block Reader** pointed at the main Cannon Mount block.
 - An **Environment Detector** (for `entity_turret.lua`) or a **Player Detector** (for `player_turret.lua`).
 - A **Monitor**.
@@ -29,7 +30,7 @@ An advanced, high-precision auto-turret script designed for CC:Tweaked and the C
 
 ### How to Setup:
 
-- **Guide:** https://youtu.be/SptnBc3WCuM?si=XpBNvYmqPQH0OjQT
+- **Guide:** https://www.youtube.com/watch?v=qtvYkLEvNfg
 
 ## How to Use
 
