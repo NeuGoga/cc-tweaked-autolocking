@@ -1,0 +1,29 @@
+{
+  "header": {
+    "width": 57,
+    "height": 24,
+    "fps": 20,
+    "scale": 0.5,
+    "palette": {
+      "0": "white",
+      "1": "orange",
+      "2": "magenta",
+      "3": "lightBlue",
+      "4": "yellow",
+      "5": "lime",
+      "6": "pink",
+      "7": "gray",
+      "8": "lightGray",
+      "9": "cyan",
+      "a": "purple",
+      "b": "blue",
+      "c": "brown",
+      "d": "green",
+      "e": "red",
+      "f": "black"
+    }
+  },
+  "chunks": [
+    "animation_0.canim"
+  ]
+}
