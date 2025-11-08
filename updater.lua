@@ -123,6 +123,25 @@ for _, filename in ipairs(files_to_check) do
         local localVersion = (localManifest.files and localManifest.files[filename]) and localManifest.files[filename].version or "0.0"
         if compareVersions(remoteData.version, localVersion) then
             print(string.format("Updating %s (v%s -> v%s)...", filename, localVersion, remoteData.version))
+            if filename:match("%.mcanim$") then
+                local folder_name = fs.getName(filename):gsub("%.mcanim", "")
+                if not fs.exists(folder_name) then fs.makeDir(folder_name) end
+                
+                local master_path = fs.combine(folder_name, filename)
+                if download(remoteData.source, master_path) then
+                    local mf = fs.open(master_path, "r"); local mc = mf.readAll(); mf.close()
+                    local master_anim = textutils.unserializeJSON(mc)
+                    if master_anim and master_anim.chunks then
+                        print("  -> Found " .. #master_anim.chunks .. " chunks. Downloading...")
+                        local base_url = remoteData.source:gsub(filename, "")
+                        for i, chunk_name in ipairs(master_anim.chunks) do
+                            download(base_url .. chunk_name, fs.combine(folder_name, chunk_name))
+                        end
+                    end
+                end
+            else
+                download(remoteData.source, filename)
+            end
             download(remoteData.source, filename)
         else
             print(string.format("%s is up to date (v%s)", filename, localVersion))

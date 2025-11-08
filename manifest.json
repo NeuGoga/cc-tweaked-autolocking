@@ -2,17 +2,39 @@
   "project": "CreateBigCannons Autolocking Turret",
   "files": {
     "updater": {
-      "version": "2.0",
+      "version": "2.1",
       "source": "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-autolocking/main/updater.lua"
     },
     "sha256": {
       "version": "1.0",
       "source": "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-autolocking/main/sha256.lua"
     },
+    "animlib": {
+      "version": "1.0",
+      "source": "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-media-player/main/animlib.lua"
+    },
+    "base64": {
+      "version": "1.0",
+      "source": "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-media-player/main/base64.lua"
+    },
+    "zlib_decompress": {
+      "version": "1.0",
+      "source": "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-media-player/main/zlib_decompress.lua"
+    },
+    "animation.mcanim": {
+      "version": "1.0",
+      "source": "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-autolocking/main/animation/animation.mcanim"
+    },
     "player_turret": {
-      "version": "7.2", 
+      "version": "7.3", 
       "source": "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-autolocking/main/player_turret.lua",
-      "dependencies": ["sha256"]
+      "dependencies": [
+      "sha256",
+      "zlib_decompress",
+      "animation.mcanim",
+      "base64",
+      "animlib"
+    ]
     },
     "entity_turret": {
       "version": "3.1",
