@@ -37,9 +37,15 @@
     ]
     },
     "entity_turret": {
-      "version": "3.1",
+      "version": "3.2",
       "source": "https://raw.githubusercontent.com/NeuGoga/cc-tweaked-autolocking/main/entity_turret.lua",
-      "dependencies": ["sha256"]
+      "dependencies": [
+      "sha256",
+      "zlib_decompress",
+      "animation.mcanim",
+      "base64",
+      "animlib"
+      ]
     },
     "remote": {
       "version": "3.2",

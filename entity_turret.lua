@@ -169,7 +169,15 @@ if not (yaw and pitch and blockReader and entDet and mon and lever and modem) th
 end
 
 print("All peripherals found.")
-mon.clear(); mon.setCursorPos(1, 1); mon.write("System Ready. Made by NeuGoga."); sleep(2)
+
+local ok, animlib = pcall(require, "animlib")
+if ok then
+    animlib.play("animation/animation.mcanim", mon)
+else
+    print("Error: Could not load animlib. " .. tostring(animlib))
+    mon.clear(); mon.setCursorPos(1, 1); mon.write("System Ready.")
+    sleep(2)
+end
 
 -- =================================================================
 -- Constants and Globals
